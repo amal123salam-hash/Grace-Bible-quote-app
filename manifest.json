@@ -1,0 +1,20 @@
+{
+  "name": "Grace - Bible Quote App",
+  "short_name": "Grace",
+  "description": "Daily Bible verses and spiritual encouragement.",
+  "id": "/Grace-Bible-quote-app/",
+  "start_url": "/Grace-Bible-quote-app/",
+  "scope": "/Grace-Bible-quote-app/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#135bec",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2903/2903523.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
