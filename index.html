@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Grace - Bible Card Deck</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#135bec",
+                        gold: "#d4af37",
+                        "background-light": "#fdfcfb",
+                        "background-dark": "#0f172a",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        display: ["Playfair Display", "serif"],
+                        sans: ["Inter", "sans-serif"],
+                        notoSerif: ["Noto Serif", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'lg': '0.5rem',
+                    },
+                },
+            },
+        };
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans min-h-screen flex justify-center items-center;
+            }
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .serene-gradient {
+            background: radial-gradient(circle at top, rgba(19, 91, 236, 0.08) 0%, rgba(253, 252, 251, 1) 100%);
+        }
+        .dark .serene-gradient {
+            background: radial-gradient(circle at top, rgba(19, 91, 236, 0.15) 0%, rgba(15, 23, 42, 1) 100%);
+        }
+        
+        .carousel-container {
+            scroll-snap-type: x mandatory;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            perspective: 1000px;
+        }
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .premium-card {
+            scroll-snap-align: center;
+            flex-shrink: 0;
+            transition: transform 0.3s ease-out;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-inner-border {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+        
+        .tactile-edge {
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 
+                        0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .ios-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-container {
+            perspective: 1000px;
+        }
+
+        .quote-font {
+            font-family: 'Noto Serif', serif;
+        }
+
+        /* Screen Simulation */
+        .app-shell {
+            width: 393px;
+            height: 852px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 8px solid #111827;
+            border-radius: 3rem;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation, useParams } = ReactRouterDOM;
+
+        // --- Data ---
+        const BIBLE_CARDS = [
+            { id: "luke6-31", title: "Golden Rule", verse: "Luke 6:31", quote: "Do to others as you would have them do to you.", icon: "diversity_3", img: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=600" },
+            { id: "mark12-31", title: "Greatest Love", verse: "Mark 12:31", quote: "Love your neighbor as yourself.", icon: "favorite", img: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=600" },
+            { id: "micah6-8", title: "Humble Path", verse: "Micah 6:8", quote: "Walk humbly with your God.", icon: "elderly", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600" },
+            { id: "matthew5-37", title: "Pure Word", verse: "Matthew 5:37", quote: "Let your ‘Yes’ be yes, and your ‘No,’ no.", icon: "chat_bubble", img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs14-29", title: "Patient Soul", verse: "Proverbs 14:29", quote: "Whoever is slow to anger has great understanding.", icon: "self_improvement", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCTiNLKYNn1pEwFiaFFaA7khy_DYxls3Uno3X0WoSNyNEp4Vg7Mg5imIgsH6H1tid9HvQnfwiowpK9hwYYUReNizZyX0IaByi0dYPw0ITJZRpJWqWmcihik-sZEf3JIS7KvjNHfEwx0x4Hp2vMG_qS-dzl9KArMvHeknQQ8cEumhAvj-iaMjBldQcZRYNr8Xrf9ofLNIS3cIgs4xN07SGtQvTaWOcRTaE8_bf2ecpc53riwpNBkZ60rEKfmflO9cR0n6_IbAQ-NjO6A" },
+            { id: "proverbs12-15", title: "Wise Choice", verse: "Proverbs 12:15", quote: "The wise listen to advice.", icon: "hearing", img: "https://images.unsplash.com/photo-1490127252417-7c393f993ee4?auto=format&fit=crop&q=80&w=600" },
+            { id: "ephesians4-15", title: "True Heart", verse: "Ephesians 4:15", quote: "Speak the truth in love.", icon: "volunteer_activism", img: "https://images.unsplash.com/photo-1516733959033-ef446656514d?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs16-32", title: "Quiet Power", verse: "Proverbs 16:32", quote: "Better a patient person than a warrior.", icon: "shield", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600" },
+            { id: "ephesians4-32", title: "Kind Grace", verse: "Ephesians 4:32", quote: "Be kind and compassionate to one another.", icon: "handshake", img: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs15-1", title: "Gentle Spirit", verse: "Proverbs 15:1", quote: "A gentle answer turns away wrath.", icon: "eco", img: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=600" },
+            { id: "colossians3-23", title: "Full Devotion", verse: "Colossians 3:23", quote: "Whatever you do, do it with all your heart.", icon: "favorite", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs9-10", title: "Beginning", verse: "Proverbs 9:10", quote: "The fear of the Lord is the beginning of wisdom.", icon: "school", img: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=600" },
+            { id: "1john3-18", title: "Active Love", verse: "1 John 3:18", quote: "Let us not love with words or speech but with actions.", icon: "auto_awesome", img: "https://images.unsplash.com/photo-1501446529957-6226bd447c46?auto=format&fit=crop&q=80&w=600" },
+            { id: "romans12-21", title: "Good Victory", verse: "Romans 12:21", quote: "Do not be overcome by evil, but overcome evil with good.", icon: "wb_sunny", img: "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&q=80&w=600" },
+            { id: "matthew5-9", title: "Peacemaker", verse: "Matthew 5:9", quote: "Blessed are the peacemakers.", icon: "church", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBDRwr6koDhGusoNrEQU77nyTPKzq7xQl33M9O34oLAyKf3tjtE-WemEtDgjnLoMyznE0en1QXHtv9so7rfnlL9iBUNQS5rruOhOLkanFnZmamWsyQXT77JRAOzDxbEPt6TCOrA1WRw0gRsibbyHJkYgVg1xhQYpFMyvxVr0fBk5-_5CG2ClhigoKudrY8VRz-nGRPhYCdB3uTjX1ZlwzReyscXka3MlkiRu3GLGTKG_iHezfC5tJZwpRmLSIl6aUD5v816WCMO1178", featured: true },
+            { id: "proverbs22-1", title: "Good Name", verse: "Proverbs 22:1", quote: "A good name is more desirable than great riches.", icon: "stars", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=600" },
+            { id: "james1-19", title: "Swift Ear", verse: "James 1:19", quote: "Be quick to listen, slow to speak.", icon: "hearing", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCztLDr4V9KF7zu_d7UIvY5S8iGQmBnTj4HDXFwNTLIVcaXmNLKLrEtiI0shyOZP26lMqgtbh9NNiDgCuPEC3DnV8eecabKHikABfCoOM62ABPdEuTAmgrNg_EHeCzF20rG2HJsfSxptcONiYloEh8zTlSFL_os5wAfmB3XVYSY1ItVwRyKqiFeqZnI5BJGBs-eNu0mllGMqMRhcfypDMG2doeUvlayG01hcRoB611CJ7c2QAYjmD3h4dhGfUHAI57DY536tFSRsUQZ" },
+            { id: "proverbs13-20", title: "Wise Walk", verse: "Proverbs 13:20", quote: "Whoever walks with the wise becomes wise.", icon: "groups", img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=600" },
+            { id: "galatians5-13", title: "Humble Service", verse: "Galatians 5:13", quote: "Serve one another humbly in love.", icon: "front_hand", img: "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=600" },
+            { id: "colossians4-6", title: "Graceful Speech", verse: "Colossians 4:6", quote: "Let your conversation be always full of grace.", icon: "record_voice_over", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs17-22", title: "Joyful Heart", verse: "Proverbs 17:22", quote: "A cheerful heart is good medicine.", icon: "sentiment_satisfied", img: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&q=80&w=600" },
+            { id: "galatians6-2", title: "Shared Burden", verse: "Galatians 6:2", quote: "Carry each other’s burdens, and in this way you will fulfill the law of Christ.", icon: "support", img: "https://images.unsplash.com/photo-1527525443983-6e60c75efe46?auto=format&fit=crop&q=80&w=600" },
+            { id: "psalm34-14", title: "Pursue Peace", verse: "Psalm 34:14", quote: "Seek peace and pursue it.", icon: "air", img: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?auto=format&fit=crop&q=80&w=600" },
+            { id: "philippians4-8", title: "Noble Mind", verse: "Philippians 4:8", quote: "Whatever is true, noble, right—think about such things.", icon: "psychology", img: "https://images.unsplash.com/photo-1516339901600-2e1a62986347?auto=format&fit=crop&q=80&w=600" },
+            { id: "romans15-13", title: "Fountain of Hope", verse: "Romans 15:13", quote: "May the God of hope fill you with all joy and peace.", icon: "spa", img: "https://images.unsplash.com/photo-1444464666168-49d633b867ad?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs17-17", title: "True Friend", verse: "Proverbs 17:17", quote: "A friend loves at all times, and a brother is born for a time of adversity.", icon: "group_add", img: "https://images.unsplash.com/photo-1475483768296-6163e08872a1?auto=format&fit=crop&q=80&w=600" },
+            { id: "matthew18-20", title: "Gathered", verse: "Matthew 18:20", quote: "For where two or three gather in my name, there am I with them.", icon: "groups_3", img: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=600" },
+            { id: "romans12-5", title: "One Body", verse: "Romans 12:5", quote: "In Christ we, though many, form one body, and each member belongs to all the others.", icon: "hub", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=600" },
+            { id: "1cor12-26", title: "Compassion", verse: "1 Corinthians 12:26", quote: "If one part suffers, every part suffers with it; if one part is honored, every part rejoices with it.", icon: "healing", img: "https://images.unsplash.com/photo-1516550135131-fe3dcb0bedc7?auto=format&fit=crop&q=80&w=600" },
+            { id: "1peter4-9", title: "Hospitality", verse: "1 Peter 4:9", quote: "Offer hospitality to one another without grumbling.", icon: "door_front", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=600" },
+            { id: "acts2-44", title: "Common Life", verse: "Acts 2:44", quote: "All the believers were together and had everything in common.", icon: "cottage", img: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=600" },
+            { id: "luke6-38", title: "Over-flowing", verse: "Luke 6:38", quote: "Give, and it will be given to you. Good measure, pressed down, shaken together, running over.", icon: "volunteer_activism", img: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=600" },
+            { id: "2cor9-6", title: "Harvest", verse: "2 Corinthians 9:6", quote: "Whoever sows sparingly will also reap sparingly, and whoever sows bountifully will also reap bountifully.", icon: "agriculture", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=600" },
+            { id: "proverbs3-27", title: "Power to Act", verse: "Proverbs 3:27", quote: "Do not withhold good from those to whom it is due, when it is in your power to act.", icon: "bolt", img: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=600" }
+        ];
+
+        // --- Common Components ---
+
+        const StatusBar = () => (
+            <div class="h-12 w-full flex items-center justify-between px-8 pt-4 shrink-0 z-50 relative">
+                <span class="text-xs font-semibold dark:text-white">9:41</span>
+                <div class="flex space-x-1.5 items-center">
+                    <span class="material-symbols-outlined text-[16px] dark:text-white">signal_cellular_alt</span>
+                    <span class="material-symbols-outlined text-[16px] dark:text-white">wifi</span>
+                    <span class="material-symbols-outlined text-[16px] dark:text-white">battery_full</span>
+                </div>
+            </div>
+        );
+
+        const ThemeToggle = () => {
+            const toggle = () => document.documentElement.classList.toggle('dark');
+            return (
+                <button 
+                    onClick={toggle}
+                    className="absolute top-16 right-6 p-2 bg-white/40 dark:bg-slate-800/40 backdrop-blur rounded-full shadow-sm border border-slate-200/50 dark:border-slate-700/50 z-20"
+                >
+                    <span className="material-symbols-outlined text-sm text-slate-500 dark:text-slate-400">
+                        dark_mode
+                    </span>
+                </button>
+            );
+        };
+
+        const NavBar = () => {
+            const location = useLocation();
+            const isActive = (path) => location.pathname === path;
+
+            return (
+                <nav className="pb-8 pt-4 px-6 border-t border-slate-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shrink-0">
+                    <div className="flex justify-between items-center max-w-sm mx-auto">
+                        <Link to="/" className={`flex flex-col items-center space-y-1 ${isActive('/') ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}>
+                            <span className="material-symbols-outlined">home</span>
+                            <span className="text-[10px] font-medium">Home</span>
+                        </Link>
+                        <div className="flex flex-col items-center space-y-1 text-slate-400 dark:text-slate-500">
+                            <span className="material-symbols-outlined">explore</span>
+                            <span className="text-[10px] font-medium">Browse</span>
+                        </div>
+                        <div className="flex flex-col items-center space-y-1 text-slate-400 dark:text-slate-500">
+                            <span className="material-symbols-outlined">favorite</span>
+                            <span className="text-[10px] font-medium">Favorites</span>
+                        </div>
+                        <div className="flex flex-col items-center space-y-1 text-slate-400 dark:text-slate-500">
+                            <span className="material-symbols-outlined">settings</span>
+                            <span className="text-[10px] font-medium">Settings</span>
+                        </div>
+                    </div>
+                    <div className="mt-6 mx-auto w-32 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                </nav>
+            );
+        };
+
+        // --- Screens ---
+
+        const HomePage = () => {
+            const shuffledCards = useMemo(() => {
+                return [...BIBLE_CARDS].sort(() => Math.random() - 0.5);
+            }, []);
+
+            return (
+                <div className="flex flex-col h-full bg-background-light dark:bg-background-dark">
+                    <StatusBar />
+                    <ThemeToggle />
+                    
+                    <div className="absolute top-16 left-6 flex items-center space-x-2 bg-white/40 dark:bg-slate-800/40 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200/50 dark:border-slate-700/50 z-10">
+                        <span className="material-symbols-outlined text-primary text-sm">music_note</span>
+                        <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Devotional Mix</span>
+                    </div>
+
+                    <header className="px-6 py-8 flex flex-col items-center shrink-0">
+                        <h1 className="font-display text-3xl font-semibold italic text-primary">Grace</h1>
+                        <p className="text-[10px] tracking-[0.2em] uppercase text-slate-400 dark:text-slate-500 mt-2 font-semibold">Heavenly Whispers</p>
+                    </header>
+
+                    <main className="flex-1 flex flex-col items-center justify-start serene-gradient overflow-hidden">
+                        <div className="text-center mb-6 pt-4">
+                            <h2 className="text-xl font-display text-slate-800 dark:text-slate-100">Draw a Card</h2>
+                            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Swipe through the deck and tap</p>
+                        </div>
+
+                        <div className="w-full overflow-x-auto carousel-container flex items-center py-6 px-[85px] gap-8">
+                            {shuffledCards.map((card) => (
+                                <Link 
+                                    key={card.id}
+                                    to={`/revealed/${card.id}`} 
+                                    className={`block w-[220px] h-[340px] bg-white dark:bg-slate-800 rounded-[2rem] premium-card tactile-edge overflow-hidden border relative active:scale-95 cursor-pointer ${card.featured ? 'border-2 border-gold/40 shadow-[0_25px_50px_-12px_rgba(212,175,55,0.25)]' : 'border-slate-200 dark:border-slate-700'}`}
+                                >
+                                    <img alt={card.title} className="absolute inset-0 w-full h-full object-cover" src={card.img}/>
+                                    <div className="absolute inset-0 card-inner-border m-3 rounded-[1.5rem] pointer-events-none"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                    <div className="absolute bottom-6 left-0 right-0 text-center px-4">
+                                        <span className={`uppercase tracking-[0.3em] font-semibold ${card.featured ? 'text-gold text-[12px] font-bold drop-shadow-sm' : 'text-white text-[10px]'}`}>
+                                            {card.title}
+                                        </span>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                        
+                        <div className="mt-8 text-center px-12 mb-8">
+                            <p className="text-slate-400 dark:text-slate-500 text-xs italic font-light leading-relaxed">
+                                "Thy word is a lamp unto my feet,<br/>and a light unto my path."
+                            </p>
+                        </div>
+                    </main>
+                    <NavBar />
+                </div>
+            );
+        };
+
+        const RevealedScreen = () => {
+            const { id } = useParams();
+            const navigate = useNavigate();
+            const card = BIBLE_CARDS.find(c => c.id === id) || BIBLE_CARDS[0];
+            
+            return (
+                <div className="flex flex-col h-full bg-background-light dark:bg-background-dark">
+                    <StatusBar />
+                    <ThemeToggle />
+                    
+                    <header className="px-6 py-4 flex justify-between items-center z-10">
+                        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                            <span className="material-symbols-outlined">arrow_back_ios_new</span>
+                        </button>
+                        <h1 className="text-lg font-semibold text-slate-800 dark:text-white">Revealed</h1>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                            <span className="material-symbols-outlined">more_horiz</span>
+                        </button>
+                    </header>
+
+                    <main className="flex-1 flex flex-col px-6 pt-2 pb-6 items-center justify-center space-y-6 overflow-hidden">
+                        <div className="card-container w-full aspect-[3/4.5] max-h-[460px]">
+                            <div className="bible-card w-full h-full bg-card-light dark:bg-card-dark rounded-[2.5rem] ios-shadow p-8 flex flex-col justify-between relative overflow-hidden border border-slate-100 dark:border-slate-700/50">
+                                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20"></div>
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/10 rounded-full -ml-16 -mb-16"></div>
+                                
+                                <div className="flex justify-center text-primary/10">
+                                    <span className="material-symbols-outlined text-5xl">{card.icon}</span>
+                                </div>
+
+                                <div className="flex-1 flex flex-col justify-center text-center space-y-6">
+                                    <p className={`quote-font leading-relaxed italic text-slate-800 dark:text-slate-100 ${card.quote.length > 80 ? 'text-xl' : 'text-2xl'}`}>
+                                        "{card.quote}"
+                                    </p>
+                                    <div className="space-y-1">
+                                        <div className="w-12 h-0.5 bg-primary/30 mx-auto mb-4"></div>
+                                        <p className="font-bold text-primary tracking-widest uppercase text-sm">{card.verse}</p>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold tracking-[0.2em]">HOLY BIBLE</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex justify-center pt-2">
+                                    <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="w-full space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <button className="flex items-center justify-center gap-2 py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl transition-all font-semibold text-sm">
+                                    <span className="material-symbols-outlined text-lg">content_copy</span>
+                                    <span>Copy</span>
+                                </button>
+                                <button className="flex items-center justify-center gap-2 py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl transition-all font-semibold text-sm">
+                                    <span className="material-symbols-outlined text-lg">ios_share</span>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                            <button onClick={() => navigate('/')} className="w-full py-4 bg-primary hover:bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-3">
+                                <span className="material-symbols-outlined">style</span>
+                                Draw Another
+                            </button>
+                        </div>
+                    </main>
+                    
+                    <div className="h-8 flex justify-center items-center pb-2">
+                        <div className="w-32 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <div className="app-shell bg-background-light dark:bg-background-dark">
+                        <Routes>
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/revealed/:id" element={<RevealedScreen />} />
+                        </Routes>
+                    </div>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
