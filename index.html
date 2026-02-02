@@ -114,6 +114,12 @@
     }
   </style>
   </head>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/Grace-Bible-quote-app/sw.js');
+  }
+</script>
+    
 <body>
     <div id="root"></div>
 
