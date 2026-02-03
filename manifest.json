@@ -9,6 +9,22 @@
   "background_color": "#0f172a",
   "theme_color": "#135bec",
   "orientation": "portrait",
+  "screenshots": [
+  {
+    "src": "screenshot1.png",
+    "sizes": "1080x1920",
+    "type": "image/png",
+    "form_factor": "narrow",
+    "label": "The home screen of the Grace Bible App"
+  },
+  {
+    "src": "screenshot2.png",
+    "sizes": "1080x1920",
+    "type": "image/png",
+    "form_factor": "narrow",
+    "label": "A beautiful daily Bible verse card"
+  }
+]
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2903/2903523.png",
