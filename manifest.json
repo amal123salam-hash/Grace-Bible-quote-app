@@ -15,25 +15,25 @@
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "The home screen of the Grace Bible App"
+      "label": "Home screen"
     },
     {
       "src": "screenshot2.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "A beautiful daily Bible verse card"
+      "label": "Verse view"
     }
   ],
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2903/2903523.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2903/2903523.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
